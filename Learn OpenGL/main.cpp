@@ -1,15 +1,16 @@
 #pragma once
 
+#include <iostream>
 #include <glad/glad.h>
 #include "glad.c"
 #include <GLFW/glfw3.h>
-#include <iostream>
-
 #include "shader.hpp"
 #include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+
+float mixPercent;
 
 int main()
 {
@@ -137,6 +138,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		ourShader.use();
+		ourShader.setFloat("mixPercent", mixPercent);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textures[0]);
 		glActiveTexture(GL_TEXTURE1);
@@ -164,5 +166,13 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
+	}
+	else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && mixPercent > 0)
+	{
+		mixPercent -= 0.01;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && mixPercent < 1)
+	{
+		mixPercent += 0.01;
 	}
 }
