@@ -44,6 +44,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -71,8 +72,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\Danny Le\source\repos\Learn OpenGL\Learn OpenGL\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Users\Danny Le\source\repos\Learn OpenGL\Learn OpenGL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Danny Le\RiderProjects\Learn-OpenGL\Learn OpenGL\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Danny Le\RiderProjects\Learn-OpenGL\Learn OpenGL\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
