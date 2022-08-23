@@ -232,7 +232,15 @@ int main()
 		ourShader.use();
 		ourShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
 		ourShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		ourShader.setVec3("lightPos", lightPos);
+		//ourShader.setVec3("lightPos", lightPos);
+		ourShader.setVec4("light.vector", camera.Position.x, camera.Position.y, camera.Position.z, 0.0f);
+		ourShader.setVec3("light.direction", camera.Front);
+		ourShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+		ourShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+		ourShader.setFloat("light.constant", 1.0f);
+		ourShader.setFloat("light.linear", 0.09f);
+		ourShader.setFloat("light.quadratic", 0.032f);
+		
 		ourShader.setVec3("viewPos", camera.Position);
 		
 		glm::vec3 lightColor;
@@ -273,7 +281,17 @@ int main()
 		ourShader.setMat4("model", model);
 		
 		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (unsigned int i = 0; i < 10; i++)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians( angle ),
+										glm::vec3(1.0f, 0.3f, 0.5f));
+			ourShader.setMat4("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		
 		lightCubeShader.use();
 		lightCubeShader.setMat4("projection", projection);
@@ -289,16 +307,6 @@ int main()
 		
 		
 		/*
-		for (unsigned int i = 0; i < 10; i++)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians( angle ),
-										glm::vec3(1.0f, 0.3f, 0.5f));
-			ourShader.setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
 		*/
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		
