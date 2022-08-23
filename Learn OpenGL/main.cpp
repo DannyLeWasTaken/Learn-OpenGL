@@ -135,10 +135,10 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate texture
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("container2.png", &width, &height, &nrChannels, 0);
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
@@ -154,7 +154,7 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
-	data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
+	data = stbi_load("container2_specular.png", &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -185,11 +185,12 @@ int main()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	
 	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	//glEnableVertexAttribArray(1);
 
-	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	//glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -210,9 +211,8 @@ int main()
 	
 	// Setting textures
 	ourShader.use();
-	//ourShader.setInt("texture1", 0);
-	//ourShader.setInt("texture2", 1);
-	//std::cout << vec.x << vec.y << vec.z << std::endl;
+	ourShader.setInt("material.diffuse", 0);
+	ourShader.setInt("material.specular", 1);
 
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 	
@@ -236,9 +236,9 @@ int main()
 		ourShader.setVec3("viewPos", camera.Position);
 		
 		glm::vec3 lightColor;
-		lightColor.x = sin(glfwGetTime() * 2.0f);
-		lightColor.y = sin(glfwGetTime() * 0.7f);
-		lightColor.z = sin(glfwGetTime() * 1.3f);
+		lightColor.x = 1.0f;
+		lightColor.y = 1.0f;
+		lightColor.z = 1.0f;
 		
 		ourShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
 		ourShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
@@ -263,6 +263,11 @@ int main()
 		//glBindTexture(GL_TEXTURE_2D, textures[0]);
 		//glActiveTexture(GL_TEXTURE1);
 		//glBindTexture(GL_TEXTURE_2D, textures[1]);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textures[0]);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textures[1]);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		ourShader.setMat4("model", model);
