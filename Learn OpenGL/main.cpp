@@ -125,8 +125,8 @@ int main()
 	};
 
 	stbi_set_flip_vertically_on_load(true);
-	unsigned int textures[2];
-	glGenTextures(2, textures);
+	unsigned int textures[3];
+	glGenTextures(3, textures);
 	glBindTexture(GL_TEXTURE_2D, textures[0]);
 	// set texture wrapping/filtering options
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -147,6 +147,7 @@ int main()
 	}
 	stbi_image_free(data);
 
+
 	glBindTexture(GL_TEXTURE_2D, textures[1]);
 	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -165,7 +166,26 @@ int main()
 		std::cout << "Failed to load texture" << std::endl;
 	}
 	stbi_image_free(data);
+	
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+	data = stbi_load("matrix.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+
+	
 	unsigned int cubeVBO, cubeVAO, EBO;
 	glGenVertexArrays(1, &cubeVAO);
 	glGenBuffers(1, &cubeVBO);
@@ -213,6 +233,7 @@ int main()
 	ourShader.use();
 	ourShader.setInt("material.diffuse", 0);
 	ourShader.setInt("material.specular", 1);
+	ourShader.setInt("material.emission", 2);
 
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 	
@@ -268,6 +289,8 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, textures[0]);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, textures[1]);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, textures[2]);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		ourShader.setMat4("model", model);
