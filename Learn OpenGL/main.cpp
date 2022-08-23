@@ -232,6 +232,7 @@ int main()
 		ourShader.use();
 		ourShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
 		ourShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		lightPos = glm::vec3(1.2f * (cos(glfwGetTime())), 1.0f, 2.0f * (cos(glfwGetTime())) );
 		ourShader.setVec3("lightPos", lightPos);
 		ourShader.setVec3("viewPos", camera.Position);
 		
@@ -257,7 +258,6 @@ int main()
 		lightCubeShader.setMat4("view", view);
 		
 		model = glm::mat4(1.0f);
-		lightPos = glm::vec3(1.2f * (cos(glfwGetTime())), 1.0f, 2.0f * (cos(glfwGetTime())) );
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f));
 		lightCubeShader.setMat4("model", model);
