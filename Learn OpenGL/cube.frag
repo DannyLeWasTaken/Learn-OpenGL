@@ -2,6 +2,7 @@
 
 in vec3 Normal;
 in vec3 FragPos;
+in vec3 FragCol;
 out vec4 FragColor;
 
 uniform vec3 objectColor;
@@ -11,6 +12,7 @@ uniform vec3 viewPos;
 
 void main()
 {
+	/*
 	float ambientStrength = 0.1;
 	float specularStrength = 0.5;
 	vec3 ambient = ambientStrength * lightColor;
@@ -29,6 +31,7 @@ void main()
 	result += diffuse;
 	result += specular;
 	result *= objectColor;
+	*/
 	
-	FragColor = vec4(result, 1.0); 
+	FragColor = vec4(FragCol, 1.0); 
 }
