@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include <glad/glad.h>
 #include "glad.c"
@@ -8,16 +8,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "camera.hpp"
+#include "model.hpp"
 
 #include "shader.hpp"
 #include "stb_image.h"
 
-struct Vertex
-{
-	glm::vec3 Position;
-	glm::vec3 Normal;
-	glm::vec2 TexCoords;
-};
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -65,6 +60,7 @@ int main()
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+
 	
 	Shader ourShader("cube.vert", "cube.frag");
 	Shader lightCubeShader("light_cube.vert", "light_cube.frag");
@@ -136,7 +132,8 @@ int main()
 		1.0f, 0.f,
 		0.5f, 1.0f
 	};
-
+	
+	
 	stbi_set_flip_vertically_on_load(true);
 	unsigned int textures[2];
 	glGenTextures(2, textures);
@@ -178,19 +175,20 @@ int main()
 		std::cout << "Failed to load texture" << std::endl;
 	}
 	stbi_image_free(data);
-
+	
+	
 	unsigned int cubeVBO, cubeVAO, EBO;
 	glGenVertexArrays(1, &cubeVAO);
 	glGenBuffers(1, &cubeVBO);
 	//glGenBuffers(1, &EBO);
 	glBindVertexArray(cubeVAO);
-
+	
 
 	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), ind^ices, GL_STATIC_DRAW);
 	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -217,8 +215,8 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 	
@@ -226,6 +224,12 @@ int main()
 	ourShader.use();
 	ourShader.setInt("material.diffuse", 0);
 	ourShader.setInt("material.specular", 1);
+
+	std::string location = "C:/Users/Danny Le/RiderProjects/Learn-OpenGL/Learn OpenGL/backpack/backpack.obj";
+
+	//Shader ourShader("light_cube.vert", "light_cube.frag");
+	
+	Model ourModel("C:/Users/Danny Le/RiderProjects/Learn-OpenGL/Learn OpenGL/backpack/backpack.obj");
 	
 	// Render loop
 	while (!glfwWindowShouldClose(window))
@@ -239,7 +243,8 @@ int main()
 		// Rendering commands here
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		
+		
 		ourShader.use();
 		ourShader.setVec3("viewPos", camera.Position);
 		
@@ -274,22 +279,38 @@ int main()
 		ourShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
 		ourShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 		ourShader.setFloat("material.shininess", 32.0f);
-
+		
 		
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
+		
+
+		glm::mat4 model = glm::mat4(1.0f);
+		ourShader.setMat4("model", model);
+		
+		{
+			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+			glm::mat4 view = camera.GetViewMatrix();
+			ourShader.setMat4("projection", projection);
+			ourShader.setMat4("view", view);
+
+			// render the loaded model
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(0.0f, 0.0f, -4.0f)); // translate it down so it's at the center of the scene
+			model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
+			ourShader.setMat4("model", model);
+			ourModel.Draw(ourShader);
+		}
+		
+		glBindVertexArray(cubeVAO);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textures[0]);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, textures[1]);
-
-		glm::mat4 model = glm::mat4(1.0f);
-		ourShader.setMat4("model", model);
 		
-		glBindVertexArray(cubeVAO);
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			model = glm::mat4(1.0f);
@@ -321,6 +342,10 @@ int main()
 		/*
 		*/
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+		
+
 		
 		// check and call events and swap the buffers
 		glfwSwapBuffers(window);
