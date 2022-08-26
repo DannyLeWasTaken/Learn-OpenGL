@@ -163,6 +163,50 @@ int main()
 		1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
 		1.0f,  0.5f,  0.0f,  1.0f,  0.0f
 	};
+	float windingCubeVertices[] = {
+		// back face
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f, // top-right
+		0.5f, -0.5f, -0.5f, 1.0f, 0.0f, // bottom-right
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f, // top-right
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, // top-left
+		// front face
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, // bottom-left
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f, // bottom-right
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f, // top-right
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f, // top-right
+		-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, // top-left
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, // bottom-left
+		// left face
+		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, // top-right
+		-0.5f, 0.5f, -0.5f, 1.0f, 1.0f, // top-left
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-left
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-left
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, // bottom-right
+		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, // top-right
+		// right face
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, // top-left
+		0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-right
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f, // top-right
+		0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-right
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, // top-left
+		0.5f, -0.5f, 0.5f, 0.0f, 0.0f, // bottom-left
+		// bottom face
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // top-right
+		0.5f, -0.5f, -0.5f, 1.0f, 1.0f, // top-left
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f, // bottom-left
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f, // bottom-left
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, // bottom-right
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // top-right
+		// top face
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, // top-left
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, // bottom-right
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f, // top-right
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, // bottom-right
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, // top-left
+		-0.5f, 0.5f, 0.5f, 0.0f, 0.0f // bottom-left
+	};
 	glm::vec3 cubePositions[] = {
 		glm::vec3( 0.0f, 0.0f, 0.0f),
 		glm::vec3( 2.0f, 5.0f, -15.0f),
@@ -285,18 +329,33 @@ int main()
 
 	glBindVertexArray(0);
 
-	unsigned int quadVBO, quadVAO;
+	
+	unsigned int quadVBO, quadVAO, windingCubeVBO, windingCubeVAO;
 	glGenBuffers(1, &quadVBO);
+	glGenBuffers(1, &windingCubeVBO);
 	glGenVertexArrays(1, &quadVAO);
-	glBindVertexArray(quadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerticies), quadVerticies, GL_STATIC_DRAW);
+	glGenVertexArrays(1, &windingCubeVAO);
 
+	glBindVertexArray(windingCubeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, windingCubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(windingCubeVertices), &windingCubeVertices, GL_STATIC_DRAW);
+	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(sizeof(float)*3));
 	glEnableVertexAttribArray(1);
+	
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerticies), quadVerticies, GL_STATIC_DRAW);
+	
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(sizeof(float)*3));
+	glEnableVertexAttribArray(1);
+	
 
 	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 	
@@ -332,6 +391,8 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		
 		glStencilMask(0x00);
+
+		// Lighting
 		
 		ourShader.use();
 		ourShader.setVec3("viewPos", camera.Position);
@@ -374,10 +435,10 @@ int main()
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
 		
-
+		
 		glm::mat4 model = glm::mat4(1.0f);
 		ourShader.setMat4("model", model);
-		
+		/*
 		{
 			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 			glm::mat4 view = camera.GetViewMatrix();
@@ -410,6 +471,7 @@ int main()
 			ourShader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
+		*/
 		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// outline drawing
@@ -440,14 +502,7 @@ int main()
 		glStencilFunc(GL_ALWAYS, 0, 0xFF);
 		glEnable(GL_DEPTH_TEST);
 		*/
-		// windows? / vegetation
-		std::map<float, glm::vec3> sorted;
-		for (unsigned int i = 0; i < vegetation.size(); i++)
-		{
-			float distance = glm::length(camera.Position - vegetation[i]);
-			sorted[distance] = vegetation[i];
-		}
-		
+		/*
 		lightCubeShader.use();
 		lightCubeShader.setMat4("projection", projection);
 		lightCubeShader.setMat4("view", view);
@@ -462,15 +517,26 @@ int main()
 			
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
+		*/
 
+		// windows? / vegetation
+		std::map<float, glm::vec3> sorted;
+		for (unsigned int i = 0; i < vegetation.size(); i++)
+		{
+			float distance = glm::length(camera.Position - vegetation[i]);
+			sorted[distance] = vegetation[i];
+		}
 		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
 		glBindVertexArray(quadVAO);
 
 		vegetationShader.use();
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, grassTextureID);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textures[0]);
 		vegetationShader.setMat4("projection", projection);
 		vegetationShader.setMat4("view", view);
+		vegetationShader.setInt("texture1", 2);
 		
 		for (std::map<float,glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it )
 		{
@@ -479,6 +545,20 @@ int main()
 			vegetationShader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
+
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		//glFrontFace(GL_CW);
+		glBindBuffer(GL_ARRAY_BUFFER, windingCubeVBO);
+		glBindVertexArray(windingCubeVAO);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+		vegetationShader.setMat4("model", model);
+		vegetationShader.setInt("texture1", 0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDisable(GL_CULL_FACE);
+
 		
 		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 		
