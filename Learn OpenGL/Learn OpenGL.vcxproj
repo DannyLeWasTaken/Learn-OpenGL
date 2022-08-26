@@ -152,6 +152,8 @@
   <ItemGroup>
     <Content Include="light_cube.frag" />
     <Content Include="shaderSingleColor.frag" />
+    <Content Include="vegetation.frag" />
+    <Content Include="vegetation.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
