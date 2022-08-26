@@ -57,7 +57,7 @@ int main()
 	}
 	glViewport(0, 0, 800, 600);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_ALWAYS);
+	glEnable(GL_STENCIL_TEST);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
@@ -65,7 +65,7 @@ int main()
 	
 	Shader ourShader("cube.vert", "cube.frag");
 	Shader lightCubeShader("light_cube.vert", "light_cube.frag");
-
+	Shader shaderSingleColor("cube.vert", "shaderSingleColor.frag");
 
 	float vertices[] = {
 		// positions // normals // texture coords
@@ -242,9 +242,13 @@ int main()
 		processInput(window);
 
 		// Rendering commands here
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		
+		glStencilMask(0x00);
 		
 		ourShader.use();
 		ourShader.setVec3("viewPos", camera.Position);
@@ -304,14 +308,15 @@ int main()
 			ourShader.setMat4("model", model);
 			ourModel.Draw(ourShader);
 		}
-		
-		glBindVertexArray(cubeVAO);
 
+		
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xFF);
+		glBindVertexArray(cubeVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textures[0]);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, textures[1]);
-		
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			model = glm::mat4(1.0f);
@@ -323,6 +328,34 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		//glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		// outline drawing
+		
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		glDisable(GL_DEPTH_TEST);
+		lightCubeShader.use();
+		
+		glBindVertexArray(cubeVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textures[0]);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textures[1]);
+		for (unsigned int i = 0; i < 10; i++)
+		{
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			model = glm::scale(model, glm::vec3(1.1f));
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians( angle ),
+										glm::vec3(1.0f, 0.3f, 0.5f));
+			lightCubeShader.setMat4("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		glBindVertexArray(0);
+		glStencilMask(0xFF);
+		glStencilFunc(GL_ALWAYS, 0, 0xFF);
+		glEnable(GL_DEPTH_TEST);
 		
 		lightCubeShader.use();
 		lightCubeShader.setMat4("projection", projection);
