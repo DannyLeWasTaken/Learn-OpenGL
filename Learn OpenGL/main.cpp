@@ -165,12 +165,13 @@ int main()
 	};
 	float quad2DVertices[] = {
 		// positions // texCoords
-		-1.0f, 1.0f, 0.0f, 1.0f,
-		-1.0f, -1.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, 1.0f, 0.0f,
-		-1.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, -1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, 1.0f, 1.0f
+		-0.3f,  1.0f,  0.0f, 1.0f,
+		-0.3f,  0.7f,  0.0f, 0.0f,
+		 0.3f,  0.7f,  1.0f, 0.0f,
+
+		-0.3f,  1.0f,  0.0f, 1.0f,
+		 0.3f,  0.7f,  1.0f, 0.0f,
+		 0.3f,  1.0f,  1.0f, 1.0f
 	};
 	float windingCubeVertices[] = {
 		// back face
@@ -237,11 +238,6 @@ int main()
 	unsigned int indices[] = { // note that we start from 0!
 		0, 1, 3, // first triangle
 		1, 2, 3 // second triangle
-	};
-	float texCoords[] = {
-		0.f, 0.f,
-		1.0f, 0.f,
-		0.5f, 1.0f
 	};
 
 	std::vector<glm::vec3> vegetation;
@@ -424,6 +420,9 @@ int main()
 	//vegetationShader.setInt("texture1", 2);
 	screenShader.use();
 	screenShader.setInt("screenTexture", 0);
+
+	unsigned int MirrorVAO, MirrorVBO;
+	
 
 	std::string location = "C:/Users/Danny Le/RiderProjects/Learn-OpenGL/Learn OpenGL/backpack/backpack.obj";
 
@@ -627,12 +626,48 @@ int main()
 		*/
 
 		// Lesson 26
-
-		// first pass
+		
+		// first pass 
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
+		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+		glBindVertexArray(cubeVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textures[0]);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textures[1]);
+		ourShader.use();
+		
+		camera.Yaw += 180.0f;
+		camera.ProcessMouseMovement(0, 0, false);
+		view = camera.GetViewMatrix();
+		camera.Yaw -= 180.0f;
+		camera.ProcessMouseMovement(0, 0, true);
+		projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		ourShader.setMat4("view", view);
+		ourShader.setMat4("projection", projection);
+		
+		for (unsigned int i = 0; i < 4; i++)
+		{
+			model = glm::mat4(2.0f);
+			model = glm::translate(model, pointLightPositions[i]);
+			model = glm::scale(model, glm::vec3(1.0f));
+			ourShader.setMat4("model", model);
+			
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		
+		// second pass / draw as normal 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glEnable(GL_DEPTH_TEST);
+		
+		camera.ProcessMouseMovement(0, 0, true);
+		view = camera.GetViewMatrix();
+		ourShader.setMat4("view", view);
 		
 		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 		glBindVertexArray(cubeVAO);
@@ -650,12 +685,9 @@ int main()
 			
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-
-		// second pass
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
 		
+		//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		//glClear(GL_COLOR_BUFFER_BIT);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
 		screenShader.use();
