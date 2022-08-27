@@ -253,7 +253,7 @@ int main()
 
 	// TEXTURES
 	
-	/*
+	
 	stbi_set_flip_vertically_on_load(true);
 	unsigned int textures[2];
 	glGenTextures(2, textures);
@@ -297,7 +297,7 @@ int main()
 	stbi_image_free(data);
 
 	unsigned int grassTextureID = TextureFromFile("window.png");
-	*/
+	
 	
 	unsigned int cubeVBO, cubeVAO, EBO;
 	glGenVertexArrays(1, &cubeVAO);
@@ -417,9 +417,9 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 	
 	// Setting textures
-	//ourShader.use();
-	//ourShader.setInt("material.diffuse", 0);
-	//ourShader.setInt("material.specular", 1);
+	ourShader.use();
+	ourShader.setInt("material.diffuse", 0);
+	ourShader.setInt("material.specular", 1);
 	//vegetationShader.use();
 	//vegetationShader.setInt("texture1", 2);
 	screenShader.use();
@@ -452,7 +452,7 @@ int main()
 		//glStencilMask(0x00);
 
 		// Lighting
-		/*
+		
 		ourShader.use();
 		ourShader.setVec3("viewPos", camera.Position);
 		
@@ -488,19 +488,19 @@ int main()
 		ourShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 		ourShader.setFloat("material.shininess", 32.0f);
 		
-		*/
+		
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
-		//ourShader.setMat4("projection", projection);
-		//ourShader.setMat4("view", view);
+		ourShader.setMat4("projection", projection);
+		ourShader.setMat4("view", view);
 		lightCubeShader.use();
 		lightCubeShader.setMat4("projection", projection);
 		lightCubeShader.setMat4("view", view);
-		//ourShader.use();
+		ourShader.use();
 		
 		
 		glm::mat4 model = glm::mat4(1.0f);
-		//ourShader.setMat4("model", model);
+		ourShader.setMat4("model", model);
 		/*
 		{
 			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -635,14 +635,18 @@ int main()
 		glEnable(GL_DEPTH_TEST);
 		
 		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-		glBindVertexArray(lightVAO);
-		lightCubeShader.use();
+		glBindVertexArray(cubeVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textures[0]);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textures[1]);
+		ourShader.use();
 		for (unsigned int i = 0; i < 4; i++)
 		{
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, pointLightPositions[i]);
 			model = glm::scale(model, glm::vec3(1.0f));
-			lightCubeShader.setMat4("model", model);
+			ourShader.setMat4("model", model);
 			
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
@@ -652,11 +656,12 @@ int main()
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
 		screenShader.use();
 		glBindBuffer(GL_ARRAY_BUFFER, quad2DVBO);
 		glBindVertexArray(quad2DVAO);
 		glDisable(GL_DEPTH_TEST);
-		glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		//glBindBuffer(GL_FRAMEBUFFER, 0);
 		
