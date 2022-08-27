@@ -150,7 +150,9 @@
     <None Include="cube.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="lesson26Shader.vert" />
     <Content Include="light_cube.frag" />
+    <Content Include="lesson26Shader.frag" />
     <Content Include="shaderSingleColor.frag" />
     <Content Include="vegetation.frag" />
     <Content Include="vegetation.vert" />
