@@ -150,10 +150,14 @@
     <None Include="cube.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="container.frag" />
+    <Content Include="container.vert" />
     <Content Include="lesson26Shader.vert" />
     <Content Include="light_cube.frag" />
     <Content Include="lesson26Shader.frag" />
     <Content Include="shaderSingleColor.frag" />
+    <Content Include="skybox.frag" />
+    <Content Include="skybox.vert" />
     <Content Include="vegetation.frag" />
     <Content Include="vegetation.vert" />
   </ItemGroup>
