@@ -21,9 +21,9 @@ void main()
     vec2( offset, -offset) // bottom-right
     );
     float kernal[9] = float[](
-        1.0, 1.0, 1.0,
-        1.0, -8.0, 1.0,
-        1.0, 1.0, 1.0
+        0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0
     );
     vec3 sampleTex[9];
     for (int i = 0; i < 9; i++)
