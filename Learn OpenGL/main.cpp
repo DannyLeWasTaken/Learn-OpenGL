@@ -445,10 +445,10 @@ int main()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)(2*sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2*sizeof(float)));
 
 	auto gShaderCode = "#version 330 core\n"
 	"layout (points) in;\n"
@@ -468,6 +468,7 @@ int main()
 	"	gl_Position = position + vec4(0.2, 0.2, 0.0, 0.0);\n"
 	"	EmitVertex();\n"
 	"	gl_Position = position + vec4(0.0, 0.4, 0.0, 0.0);\n"
+	"	fColor = vec3(1.0, 1.0, 1.0);\n"
 	"	EmitVertex();\n"
 	"	EndPrimitive();\n"
 	"}\n"
@@ -723,6 +724,7 @@ int main()
 		
 		gShader.use();
 		glBindVertexArray(geoVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, geoVBO);
 		glDrawArrays(GL_POINTS, 0, 4);
 		
 		// check and call events and swap the buffers
