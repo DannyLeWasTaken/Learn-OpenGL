@@ -426,6 +426,60 @@ int main()
 
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+
+	// Lesson: Geometry Shaders
+	float points[] = {
+		-0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // top-left
+		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // top-right
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // bottom-right
+		-0.5f, -0.5f, 1.0f, 1.0f, 0.0f  // bottom-left
+	};
+	
+	unsigned int geoVBO, geoVAO;
+	glGenVertexArrays(1, &geoVAO);
+	glGenBuffers(1, &geoVBO);
+	
+	Shader gShader("geometry.vert", "geometry.frag");
+	glBindVertexArray(geoVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, geoVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)(3 * sizeof(float)));
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)(2*sizeof(float)));
+
+	auto gShaderCode = "#version 330 core\n"
+	"layout (points) in;\n"
+	"layout (triangle_strip, max_vertices = 5) out;\n"
+	"in VS_OUT {\n"
+	"	vec3 color;\n"
+	"} gs_in[];\n"
+	"out vec3 fColor;\n"
+	"void build_house(vec4 position) {\n"
+	"	fColor = gs_in[0].color;\n"
+	"	gl_Position = position + vec4(-0.2, -0.2, 0.0, 0.0);\n"
+	"	EmitVertex();\n"
+	"	gl_Position = position + vec4(0.2, -0.2, 0.0, 0.0);\n"
+	"	EmitVertex();\n"
+	"	gl_Position = position + vec4(-0.2, 0.2, 0.0, 0.0);\n"
+	"	EmitVertex();\n"
+	"	gl_Position = position + vec4(0.2, 0.2, 0.0, 0.0);\n"
+	"	EmitVertex();\n"
+	"	gl_Position = position + vec4(0.0, 0.4, 0.0, 0.0);\n"
+	"	EmitVertex();\n"
+	"	EndPrimitive();\n"
+	"}\n"
+	"void main() {\n"
+	"	build_house(gl_in[0].gl_Position);\n"
+	"}\n";
+	int geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+	glShaderSource(geometryShader, 1, &gShaderCode, NULL);
+	glCompileShader(geometryShader);
+
+	glAttachShader(gShader.ID, geometryShader);
+	glLinkProgram(gShader.ID);
 	
 	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	//glEnableVertexAttribArray(1);
@@ -667,7 +721,9 @@ int main()
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS);
 		
-
+		gShader.use();
+		glBindVertexArray(geoVAO);
+		glDrawArrays(GL_POINTS, 0, 4);
 		
 		// check and call events and swap the buffers
 		glfwSwapBuffers(window);
