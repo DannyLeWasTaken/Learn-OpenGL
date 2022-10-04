@@ -157,6 +157,9 @@
     <Content Include="lesson26Shader.vert" />
     <Content Include="light_cube.frag" />
     <Content Include="lesson26Shader.frag" />
+    <Content Include="normalShader.frag" />
+    <Content Include="normalShader.geom" />
+    <Content Include="normalShader.vert" />
     <Content Include="shaderSingleColor.frag" />
     <Content Include="skybox.frag" />
     <Content Include="skybox.vert" />

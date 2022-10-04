@@ -486,56 +486,8 @@ int main()
 	*/
 
 	// Lesson: Exploding Shaders
-	auto gExplodingSource = "#version 330 core\n"
-	"layout (triangles) in;\n"
-	"layout (triangle_strip, max_vertices = 3) out;\n"
-	"in VS_OUT {\n"
-	"	vec2 texCoords;\n"
-	"} gs_in[];\n"
-	"out vec2 TexCoords;\n"
-	"uniform float time;\n"
-	"vec3 GetNormal()\n"
-	"{\n"
-	"	vec3 a = vec3(gl_in[0].gl_Position) - vec3(gl_in[1].gl_Position);\n"
-	"	vec3 b = vec3(gl_in[2].gl_Position) - vec3(gl_in[1].gl_Position);\n"
-	"	return normalize(cross(a,b));\n"
-	"}\n"
-	"vec4 explode(vec4 position, vec3 normal) {\n"
-	"	float magnitude = 2.0;\n"
-	"	vec3 direction = normal * ((sin(time) + 1.0) / 2.0) * magnitude;\n"
-	"	return position + vec4(direction, 0.0);\n"
-	"}\n"
-	"void main() {\n"
-	"	vec3 normal = GetNormal();\n"
-	"	gl_Position = explode(gl_in[0].gl_Position, normal);\n"
-	"	TexCoords = gs_in[0].texCoords;\n"
-	"	EmitVertex();"
-	"	gl_Position = explode(gl_in[1].gl_Position, normal);\n"
-	"	TexCoords = gs_in[1].texCoords;\n"
-	"	EmitVertex();\n"
-	"	gl_Position = explode(gl_in[2].gl_Position, normal);\n"
-	"	TexCoords = gs_in[2].texCoords;\n"
-	"	EmitVertex();\n"
-	"	EndPrimitive();\n"
-	"}\n";
-	Shader explodingShader("cube.vert", "cube.frag");
-	int explodingGeometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-	glShaderSource(explodingGeometryShader, 1, &gExplodingSource, NULL);
-	glCompileShader(explodingGeometryShader);
-
-	glAttachShader(explodingShader.ID, explodingGeometryShader);
-	glLinkProgram(explodingShader.ID);
-
-	glAttachShader(ourShader.ID, explodingGeometryShader);
-	glLinkProgram(ourShader.ID);
+	Shader explodingShader("normalShader.vert", "normalShader.frag", "normalShader.geom");
 	
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
-
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
 	// Lighting
 	unsigned int lightVAO;
 	glGenVertexArrays(1, &lightVAO);
@@ -720,19 +672,22 @@ int main()
 		{
 			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 			glm::mat4 view = camera.GetViewMatrix();
-			ourShader.setMat4("projection", projection);
-			ourShader.setMat4("view", view);
-			explodingShader.setMat4("projection", projection);
-			explodingShader.setMat4("view", view);
 
 			// render the loaded model
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, glm::vec3(0.0f, 0.0f, -4.0f)); // translate it down so it's at the center of the scene
 			model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
+			ourShader.use();
+			ourShader.setMat4("projection", projection);
+			ourShader.setMat4("view", view);
 			ourShader.setMat4("model", model);
+			ourModel.Draw(ourShader);
+
+			explodingShader.use();
+			explodingShader.setMat4("projection", projection);
+			explodingShader.setMat4("view", view);
 			explodingShader.setMat4("model", model);
 			ourModel.Draw(explodingShader);
-			ourModel.Draw(ourShader);
 		}
 
 		containerShader.use();

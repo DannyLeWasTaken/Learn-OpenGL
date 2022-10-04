@@ -38,10 +38,12 @@ public:
 		setupMesh();
 	};
 
+
 	void Draw(Shader &shader)
 	{
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
+		shader.use();
 		for (unsigned int i = 0; i < textures.size(); i++)
 		{
 			glActiveTexture(GL_TEXTURE0 + i);
