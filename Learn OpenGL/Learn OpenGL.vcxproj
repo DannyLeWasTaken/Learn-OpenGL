@@ -145,6 +145,8 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="asteroid.frag" />
+    <None Include="asteroid.vert" />
     <None Include="light_cube.vert" />
     <None Include="cube.frag" />
     <None Include="cube.vert" />
@@ -154,6 +156,8 @@
     <Content Include="container.vert" />
     <Content Include="geometry.frag" />
     <Content Include="geometry.vert" />
+    <Content Include="instancingQuad.frag" />
+    <Content Include="instancingQuad.vert" />
     <Content Include="lesson26Shader.vert" />
     <Content Include="light_cube.frag" />
     <Content Include="lesson26Shader.frag" />

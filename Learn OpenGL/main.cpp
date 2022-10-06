@@ -125,6 +125,7 @@ int main()
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
 	GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
@@ -144,6 +145,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 	glEnable(GL_BLEND);
+	glEnable(GL_MULTISAMPLE);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
@@ -485,6 +487,7 @@ int main()
 	glLinkProgram(gShader.ID);
 	*/
 
+	/*
 	// Lesson: Exploding Shaders
 	Shader explodingShader("normalShader.vert", "normalShader.frag", "normalShader.geom");
 	
@@ -501,7 +504,99 @@ int main()
 	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
+	*/
+	/*
+	// instancing
+	Shader instanceQuadShader("instancingQuad.vert", "instancingQuad.frag");
+	float instancingQuadVertices[] = {
+		// positions     // colors
+		-0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
+		 0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
+		-0.05f, -0.05f,  0.0f, 0.0f, 1.0f,
 
+		-0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
+		 0.05f, -0.05f,  0.0f, 1.0f, 0.0f,   
+		 0.05f,  0.05f,  0.0f, 1.0f, 1.0f		    		
+	};
+	
+	glm::vec2 translations[100];
+	int index = 0;
+	float offset = 0.1f;
+	for (int y = -10; y < 10; y +=2)
+	{
+		for (int x = -10; x < 10; x += 2)
+		{
+			glm::vec2 translation;
+			translation.x = (float)x / 10.0f + offset;
+			translation.y = (float)y / 10.0f + offset;
+			translations[index++] = translation;
+		}
+	}
+
+	instanceQuadShader.use();
+	for (unsigned int i =0; i < 100; i++)
+	{
+		instanceQuadShader.setVec2(("offsets[" + std::to_string(i) + "]"), translations[i]);
+	}
+
+	unsigned int instancingQuadVAO, instancingQuadVBO, instancesQuadVBO;
+	glGenBuffers(1, &instancingQuadVBO);
+	glGenBuffers(1, &instancesQuadVBO);
+	glGenVertexArrays(1, &instancingQuadVAO);
+
+	glBindVertexArray(instancingQuadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, instancingQuadVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, instancesQuadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 100, &translations[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(0));
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, instancingQuadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(instancingQuadVertices), &instancingQuadVertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2*sizeof(float)));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glVertexAttribDivisor(2, 1);
+	
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	*/
+	
+	// Asteroid field
+	unsigned int amount = 1000;
+	glm::mat4 *modelMatrices;
+	modelMatrices = new glm::mat4[amount];
+	srand(glfwGetTime());
+	float radius = 50.0;
+	float offset = 2.5f;
+	for (unsigned int i = 0; i < amount; i++)
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
+		float angle = (float)i / (float)amount * 360.0f;
+		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float x = sin(angle) * radius + displacement;
+		displacement = (rand() % (int)(2 * offset * 100))/ 100.0f - offset;
+		float y = displacement * 0.4f;
+		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float z = cos(angle) * radius + displacement;
+		model = glm::translate(model, glm::vec3(x,y,z));
+
+		// 2. scale: scale between 0.05 and 0.25f
+		float scale = (rand() % 20) / 100.0f + 0.05;
+		model = glm::scale(model, glm::vec3(scale));
+
+		// 3. rotation: add random rotation around a (semi) randomly picked rotation axis vector
+		float rotAngle = (rand() % 360);
+		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+		// 4. now add to list of matrices
+		modelMatrices[i] = model;
+	}
+
+	Model planet("C:/Users/Danny Le/RiderProjects/Learn-OpenGL/Learn OpenGL/planet/planet.obj");
+	Model rock("C:/Users/Danny Le/RiderProjects/Learn-OpenGL/Learn OpenGL/rock/rock.obj");
 	
 	unsigned int quadVBO, quadVAO, windingCubeVBO, windingCubeVAO;
 	glGenBuffers(1, &quadVBO);
@@ -601,7 +696,6 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
-		explodingShader.setFloat("time", currentFrame);
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		// input
@@ -635,7 +729,7 @@ int main()
 			ourShader.setVec3(name + "specular", 0.5f, 0.5f, 0.5f);
 		}
 		ourShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-		ourShader.setVec3("dirLight.ambient", 0.0f, 0.0f, 0.0f);
+		ourShader.setVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
 		ourShader.setVec3("dirLight.diffuse", 1.0f, 1.0f, 1.0f);
 		ourShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);	
 
@@ -682,14 +776,9 @@ int main()
 			ourShader.setMat4("view", view);
 			ourShader.setMat4("model", model);
 			ourModel.Draw(ourShader);
-
-			explodingShader.use();
-			explodingShader.setMat4("projection", projection);
-			explodingShader.setMat4("view", view);
-			explodingShader.setMat4("model", model);
-			ourModel.Draw(explodingShader);
 		}
-
+		/*
+		// Containers
 		containerShader.use();
 		containerShader.setMat4("model", model);
 		containerShader.setMat4("view", view);
@@ -714,6 +803,21 @@ int main()
 			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
+		*/
+
+		// Draw an asteroid belt
+		ourShader.use();
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		ourShader.setMat4("model", model);
+		planet.Draw(ourShader);
+		for (unsigned int i = 0; i < amount; i++)
+		{
+			ourShader.setMat4("model", modelMatrices[i]);
+			rock.Draw(ourShader);
+		}
+		
 		
 		// Skybox
 		/*
