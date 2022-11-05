@@ -696,7 +696,7 @@ int main()
 	screenShader.setInt("screenTexture", 0);
 
 	// Lesson 37
-	Shader containerShader = Shader("container.vert", "container.frag");
+	Shader containerShader = Shader("cube.vert", "cube.frag");
 	
 	unsigned int MirrorVAO, MirrorVBO;
 	
@@ -706,6 +706,10 @@ int main()
 	//Shader ourShader("light_cube.vert", "light_cube.frag");
 	
 	Model ourModel("C:/Users/Danny Le/RiderProjects/Learn-OpenGL/Learn OpenGL/backpack/backpack.obj");
+
+	// Wooden Floor
+	//glBindTexture(GL_TEXTURE_2D, textures[0]);
+	textures[0] = TextureFromFile("C:/Users/Danny Le/RiderProjects/Learn-OpenGL/Learn OpenGL/assets/wood.png");
 	
 	// Render loop
 	while (!glfwWindowShouldClose(window))
@@ -797,20 +801,27 @@ int main()
 			ourShader.setMat4("model", model);
 			ourModel.Draw(ourShader);
 		}
-		/*
+		
 		// Containers
+		/**
 		containerShader.use();
 		containerShader.setMat4("model", model);
 		containerShader.setMat4("view", view);
 		containerShader.setMat4("projection", projection);
-		containerShader.setInt("skybox", 0);
+		//containerShader.setInt("skybox", 0);
 		containerShader.setVec3("cameraPos", camera.Position);
+		**/
+
+		// Boxes
 		
 		glBindVertexArray(cubeVAO);
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, textures[0]);
-		//glActiveTexture(GL_TEXTURE1);
-		//glBindTexture(GL_TEXTURE_2D, textures[1]);
+		
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textures[0]);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textures[1]);
+		
+		
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			model = glm::mat4(1.0f);
@@ -818,13 +829,16 @@ int main()
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians( angle ),
 										glm::vec3(1.0f, 0.3f, 0.5f));
-			containerShader.setMat4("model", model);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+			//containerShader.setMat4("model", model);
+			ourShader.setFloat("material.shininess", 512.0f);
+			ourShader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		*/
+		
 
+		// Wooden floor
+		
+		/**
 		// Draw an asteroid belt
 		ourShader.use();
 		model = glm::mat4(1.0f);
@@ -837,6 +851,7 @@ int main()
 			ourShader.setMat4("model", modelMatrices[i]);
 			rock.Draw(ourShader);
 		}
+		**/
 		
 		
 		// Skybox
