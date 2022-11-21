@@ -74,6 +74,7 @@ void main()
 	}
 	result += CalcSpotLight(spotLight, norm, FragPos, viewDir);
 	float depth = LinearizeDepth(gl_FragCoord.z) / 100;
+	result = pow(result, vec3(1.0/2.2));
 	FragColor = vec4(result, 1.0);
 }
 
